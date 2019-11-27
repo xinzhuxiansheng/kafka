@@ -29,6 +29,8 @@ import org.apache.kafka.common.metrics.Metrics;
 import org.apache.kafka.common.metrics.Sensor;
 import org.apache.kafka.common.metrics.stats.Rate;
 import org.apache.kafka.common.utils.Time;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -41,7 +43,9 @@ import org.apache.kafka.common.utils.Time;
  * buffers are deallocated.
  * </ol>
  */
-public final class BufferPool {
+public final class BufferPool{
+    //yzhou
+    private static final Logger log = LoggerFactory.getLogger(BufferPool.class);
 
     private final long totalMemory;
     private final int poolableSize;
@@ -138,6 +142,8 @@ public final class BufferPool {
 
                     if (waitingTimeElapsed) {
                         this.waiters.remove(moreMemory);
+                        //yzhou
+                        log.info("BufferPool_allocate totalMemory:{},avaliableMemory:{}",totalMemory,availableMemory);
                         throw new TimeoutException("Failed to allocate memory within the configured max blocking time " + maxTimeToBlockMs + " ms.");
                     }
 

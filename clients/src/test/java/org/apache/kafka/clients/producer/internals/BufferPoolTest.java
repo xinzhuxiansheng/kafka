@@ -170,6 +170,7 @@ public class BufferPoolTest {
             fail("The buffer allocated more memory than its maximum value 10");
         } catch (TimeoutException e) {
             // this is good
+            e.printStackTrace();
         }
         long endTimeMs = systemTime.milliseconds();
         assertTrue("Allocation should finish not much later than maxBlockTimeMs", endTimeMs - beginTimeMs < maxBlockTimeMs + 1000);

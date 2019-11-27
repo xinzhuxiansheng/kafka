@@ -74,18 +74,18 @@
     </module>
 
     <!-- whitespace -->
-    <module name="GenericWhitespace"/>
-    <module name="NoWhitespaceBefore"/>
-    <module name="WhitespaceAfter" />
-    <module name="NoWhitespaceAfter"/>
-    <module name="WhitespaceAround">
-      <property name="allowEmptyConstructors" value="true"/>
-      <property name="allowEmptyMethods" value="true"/>
-    </module>
-    <module name="Indentation"/>
-    <module name="MethodParamPad"/>
-    <module name="ParenPad"/>
-    <module name="TypecastParenPad"/>
+<!--    <module name="GenericWhitespace"/>-->
+<!--    <module name="NoWhitespaceBefore"/>-->
+<!--    <module name="WhitespaceAfter" />-->
+<!--    <module name="NoWhitespaceAfter"/>-->
+<!--    <module name="WhitespaceAround">-->
+<!--      <property name="allowEmptyConstructors" value="true"/>-->
+<!--      <property name="allowEmptyMethods" value="true"/>-->
+<!--    </module>-->
+<!--    <module name="Indentation"/>-->
+<!--    <module name="MethodParamPad"/>-->
+<!--    <module name="ParenPad"/>-->
+<!--    <module name="TypecastParenPad"/>-->
 
     <!-- locale-sensitive methods should specify locale -->
     <module name="Regexp">
