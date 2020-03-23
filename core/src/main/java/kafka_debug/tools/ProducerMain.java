@@ -11,7 +11,7 @@ public class ProducerMain {
     public static void main(String[] args) throws InterruptedException {
 
         Properties properties = new Properties();
-        properties.put("bootstrap.servers", "vm01.com:9093");
+        properties.put("bootstrap.servers", "localhost:9093");
         properties.put("retries", 2); // 发送失败的最大尝试次数
         properties.put("batch.size", "1048576"); // 1048576
         properties.put("compression.type", "gzip");
@@ -26,7 +26,7 @@ public class ProducerMain {
         while(true){
             String data = i+"\\t2\\tAndroid\\t869830039316690\\thuawei\\t0\\tarmeabi-v7a\\t9\\t10.1.5\\tHWI-AL00\\tHUAWEI";
 
-            producer.send(new ProducerRecord<String, String>("yzhoutest01",data), new Callback() {
+            producer.send(new ProducerRecord<String, String>("yzhoutp01",data), new Callback() {
                 @Override
                 public void onCompletion(RecordMetadata recordMetadata, Exception e) {
                     if(null == recordMetadata){

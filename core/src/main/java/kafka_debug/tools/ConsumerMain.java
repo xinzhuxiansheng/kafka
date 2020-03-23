@@ -14,7 +14,7 @@ public class ConsumerMain {
         Properties properties = new Properties();
 
         properties.put("session.timeout.ms","30000");
-        properties.put("bootstrap.servers", "localpc.com:9093");
+        properties.put("bootstrap.servers", "localhost:9093");
         properties.put("client.id","yzhouclientid01");
         properties.setProperty("group.id", "yzhougroupid2019101103");
         properties.put("enable.auto.commit", "true");
@@ -23,7 +23,7 @@ public class ConsumerMain {
         properties.setProperty("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 
         KafkaConsumer<String,String> kafkaConsumer = new KafkaConsumer<String, String>(properties);
-        kafkaConsumer.subscribe(Arrays.asList("yzhoutest01"));
+        kafkaConsumer.subscribe(Arrays.asList("yzhoutp01"));
 
         while(true) {
             ConsumerRecords<String,String> records = kafkaConsumer.poll(10000);

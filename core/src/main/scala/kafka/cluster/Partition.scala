@@ -431,6 +431,7 @@ class Partition(val topic: String,
       leaderReplicaOpt match {
         case Some(leaderReplica) =>
           val log = leaderReplica.log.get
+          //当producer设置request.required.acks为-1时，min.insync.replicas指定replicas的最小数目（必须确认每一个repica的写数据都是成功的），如果这个数目没有达到，producer会产生异常。
           val minIsr = log.config.minInSyncReplicas
           val inSyncSize = inSyncReplicas.size
 
