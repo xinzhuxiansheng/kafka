@@ -272,9 +272,11 @@ public class MemoryRecordsBuilder implements AutoCloseable {
      * Release resources required for record appends (e.g. compression buffers). Once this method is called, it's only
      * possible to update the RecordBatch header.
      */
+    //yzhou
     public void closeForRecordAppends() {
         if (appendStream != CLOSED_STREAM) {
             try {
+                //yzhou
                 appendStream.close();
             } catch (IOException e) {
                 throw new KafkaException(e);
@@ -285,7 +287,7 @@ public class MemoryRecordsBuilder implements AutoCloseable {
     }
 
     public void abort() {
-        closeForRecordAppends();
+        closeForRecordAppends();//yzhou
         buffer().position(initialPosition);
         aborted = true;
     }
@@ -300,7 +302,7 @@ public class MemoryRecordsBuilder implements AutoCloseable {
         this.isTransactional = isTransactional;
     }
 
-
+    //yzhou
     public void close() {
         if (aborted)
             throw new IllegalStateException("Cannot close MemoryRecordsBuilder as it has already been aborted");
@@ -309,7 +311,7 @@ public class MemoryRecordsBuilder implements AutoCloseable {
             return;
 
         validateProducerState();
-
+        //yzhou
         closeForRecordAppends();
 
         if (numRecords == 0L) {

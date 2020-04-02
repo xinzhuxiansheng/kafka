@@ -198,7 +198,7 @@ public final class RecordAccumulator {
             synchronized (dq) {
                 if (closed)
                     throw new KafkaException("Producer closed while send in progress");
-                RecordAppendResult appendResult = tryAppend(timestamp, key, value, headers, callback, dq);
+                RecordAppendResult appendResult = tryAppend(timestamp, key, value, headers, callback, dq);//yzhou
                 if (appendResult != null)
                     return appendResult;
             }
@@ -213,7 +213,7 @@ public final class RecordAccumulator {
                 if (closed)
                     throw new KafkaException("Producer closed while send in progress");
 
-                RecordAppendResult appendResult = tryAppend(timestamp, key, value, headers, callback, dq);
+                RecordAppendResult appendResult = tryAppend(timestamp, key, value, headers, callback, dq);//yzhou
                 if (appendResult != null) {
                     // Somebody else found us a batch, return the one we waited for! Hopefully this doesn't happen often...
                     return appendResult;
@@ -253,12 +253,14 @@ public final class RecordAccumulator {
      *  and memory records built) in one of the following cases (whichever comes first): right before send,
      *  if it is expired, or when the producer is closed.
      */
+    //yzhou
     private RecordAppendResult tryAppend(long timestamp, byte[] key, byte[] value, Header[] headers,
                                          Callback callback, Deque<ProducerBatch> deque) {
         ProducerBatch last = deque.peekLast();
         if (last != null) {
             FutureRecordMetadata future = last.tryAppend(timestamp, key, value, headers, callback, time.milliseconds());
             if (future == null)
+                //yzhou
                 last.closeForRecordAppends();
             else
                 return new RecordAppendResult(future, deque.size() > 1 || last.isFull(), false);

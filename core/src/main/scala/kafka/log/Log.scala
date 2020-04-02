@@ -812,9 +812,10 @@ class Log(@volatile var dir: File,
    * @throws KafkaStorageException If the append fails due to an I/O error.
    * @return Information about the appended messages including the first and last offset.
    */
+    //yzhou
   def appendAsLeader(records: MemoryRecords, leaderEpoch: Int, isFromClient: Boolean = true,
                      interBrokerProtocolVersion: ApiVersion = ApiVersion.latestVersion): LogAppendInfo = {
-    append(records, isFromClient, interBrokerProtocolVersion, assignOffsets = true, leaderEpoch)
+    append(records, isFromClient, interBrokerProtocolVersion, assignOffsets = true, leaderEpoch) //yzhou
   }
 
   /**
@@ -825,7 +826,7 @@ class Log(@volatile var dir: File,
    * @return Information about the appended messages including the first and last offset.
    */
   def appendAsFollower(records: MemoryRecords): LogAppendInfo = {
-    append(records, isFromClient = false, interBrokerProtocolVersion = ApiVersion.latestVersion, assignOffsets = false, leaderEpoch = -1)
+    append(records, isFromClient = false, interBrokerProtocolVersion = ApiVersion.latestVersion, assignOffsets = false, leaderEpoch = -1)//yzhou
   }
 
   /**
@@ -844,6 +845,7 @@ class Log(@volatile var dir: File,
    * @throws UnexpectedAppendOffsetException If the first or last offset in append is less than next offset
    * @return Information about the appended messages including the first and last offset.
    */
+    //yzhou
   private def append(records: MemoryRecords, isFromClient: Boolean, interBrokerProtocolVersion: ApiVersion, assignOffsets: Boolean, leaderEpoch: Int): LogAppendInfo = {
     maybeHandleIOException(s"Error while appending records to $topicPartition in dir ${dir.getParent}") {
       val appendInfo = analyzeAndValidateRecords(records, isFromClient = isFromClient)
@@ -853,6 +855,7 @@ class Log(@volatile var dir: File,
         return appendInfo
 
       // trim any invalid bytes or partial messages before appending it to the on-disk log
+      //yzhou 在将任何无效字节或部分消息附加到磁盘日志之前，请对其进行修剪
       var validRecords = trimInvalidBytes(records, appendInfo)
 
       // they are valid, insert them in the log
@@ -864,7 +867,9 @@ class Log(@volatile var dir: File,
           appendInfo.firstOffset = Some(offset.value)
           val now = time.milliseconds
           val validateAndOffsetAssignResult = try {
-            LogValidator.validateMessagesAndAssignOffsets(validRecords,
+            info(s"yzhou config.messageFormatVersion.recordVersion.value: ${config.messageFormatVersion.recordVersion.value}")
+            //yzhou
+            LogValidator.validateMessagesAndAssignOffsets(validRecords,//yzhou
               offset,
               time,
               now,
@@ -967,7 +972,7 @@ class Log(@volatile var dir: File,
           messageOffset = appendInfo.firstOrLastOffsetOfFirstBatch,
           segmentBaseOffset = segment.baseOffset,
           relativePositionInSegment = segment.size)
-
+        //yzhou
         segment.append(largestOffset = appendInfo.lastOffset,
           largestTimestamp = appendInfo.maxTimestamp,
           shallowOffsetOfMaxTimestamp = appendInfo.offsetOfMaxTimestamp,
@@ -1121,9 +1126,9 @@ class Log(@volatile var dir: File,
   private def analyzeAndValidateRecords(records: MemoryRecords, isFromClient: Boolean): LogAppendInfo = {
     var shallowMessageCount = 0
     var validBytesCount = 0
-    var firstOffset: Option[Long] = None
-    var lastOffset = -1L
-    var sourceCodec: CompressionCodec = NoCompressionCodec
+    var firstOffset: Option[Long] = None   //第一条消息的offset
+    var lastOffset = -1L                   //最后一条消息的offset
+    var sourceCodec: CompressionCodec = NoCompressionCodec  //压缩格式
     var monotonic = true
     var maxTimestamp = RecordBatch.NO_TIMESTAMP
     var offsetOfMaxTimestamp = -1L
@@ -1145,11 +1150,12 @@ class Log(@volatile var dir: File,
       if (!readFirstMessage) {
         if (batch.magic >= RecordBatch.MAGIC_VALUE_V2)
           firstOffset = Some(batch.baseOffset)
-        lastOffsetOfFirstBatch = batch.lastOffset
+        lastOffsetOfFirstBatch = batch.lastOffset   //yzhou 因为V2中的 RecordBatch 包含1条或多条数据集
         readFirstMessage = true
       }
 
-      // check that offsets are monotonically increasing
+      // check that offsets are monotonically increasing 单调递增
+      println("lastOffset: " + lastOffset + "  ,  batch.lastOffset: "+batch.lastOffset());
       if (lastOffset >= batch.lastOffset)
         monotonic = false
 
@@ -1157,6 +1163,7 @@ class Log(@volatile var dir: File,
       lastOffset = batch.lastOffset
 
       // Check if the message sizes are valid.
+      //yzhou 检查当前每条消息字节大小，是否超过设定的maxMessageSize
       val batchSize = batch.sizeInBytes
       if (batchSize > config.maxMessageSize) {
         brokerTopicStats.topicStats(topicPartition.topic).bytesRejectedRate.mark(records.sizeInBytes)
@@ -1181,6 +1188,7 @@ class Log(@volatile var dir: File,
         sourceCodec = messageCodec
     }
 
+    //broker 如果配置全局 record的压缩格，按照broker标准走
     // Apply broker-side compression if any
     val targetCodec = BrokerCompressionCodec.getTargetCompressionCodec(config.compressionType, sourceCodec)
     LogAppendInfo(firstOffset, lastOffset, maxTimestamp, offsetOfMaxTimestamp, RecordBatch.NO_TIMESTAMP, logStartOffset,

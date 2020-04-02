@@ -904,7 +904,7 @@ public class KafkaProducer<K, V> implements Producer<K, V> {
             if (transactionManager != null && transactionManager.isTransactional())
                 transactionManager.maybeAddPartitionToTransaction(tp);
 
-            RecordAccumulator.RecordAppendResult result = accumulator.append(tp, timestamp, serializedKey,
+            RecordAccumulator.RecordAppendResult result = accumulator.append(tp, timestamp, serializedKey, //yzhou
                     serializedValue, headers, interceptCallback, remainingWaitMs);
             if (result.batchIsFull || result.newBatchCreated) {
                 log.trace("Waking up the sender since topic {} partition {} is either full or getting a new batch", record.topic(), partition);

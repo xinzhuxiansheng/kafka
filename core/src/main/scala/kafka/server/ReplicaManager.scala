@@ -480,8 +480,10 @@ class ReplicaManager(val config: KafkaConfig,
                     responseCallback: Map[TopicPartition, PartitionResponse] => Unit,
                     delayedProduceLock: Option[Lock] = None,
                     recordConversionStatsCallback: Map[TopicPartition, RecordConversionStats] => Unit = _ => ()) {
+    //验证required.acks是否超出可接受范围(-1,0,1)
     if (isValidRequiredAcks(requiredAcks)) {
       val sTime = time.milliseconds
+      //yzhou
       val localProduceResults = appendToLocalLog(internalTopicsAllowed = internalTopicsAllowed,
         isFromClient = isFromClient, entriesPerPartition, requiredAcks)
       debug("Produce to local log in %d ms".format(time.milliseconds - sTime))
@@ -731,7 +733,7 @@ class ReplicaManager(val config: KafkaConfig,
   /**
    * Append the messages to the local replica logs
    */
-  private def appendToLocalLog(internalTopicsAllowed: Boolean,
+  private def appendToLocalLog(internalTopicsAllowed: Boolean, //yzhou
                                isFromClient: Boolean,
                                entriesPerPartition: Map[TopicPartition, MemoryRecords],
                                requiredAcks: Short): Map[TopicPartition, LogAppendResult] = {
@@ -741,14 +743,17 @@ class ReplicaManager(val config: KafkaConfig,
       brokerTopicStats.allTopicsStats.totalProduceRequestRate.mark()
 
       // reject appending to internal topics if it is not allowed
+      //内部topic不允许被写入，直接返回给客户端错误信息
       if (Topic.isInternal(topicPartition.topic) && !internalTopicsAllowed) {
         (topicPartition, LogAppendResult(
           LogAppendInfo.UnknownLogAppendInfo,
           Some(new InvalidTopicException(s"Cannot append to internal topic ${topicPartition.topic}"))))
       } else {
         try {
+          //查找分区位置 在OfflinePartitions、metadataCache、None 及判断是否是主分区  ???
           val partition = getPartitionOrException(topicPartition, expectLeader = true)
-          val info = partition.appendRecordsToLeader(records, isFromClient, requiredAcks)
+          //yzhou
+          val info = partition.appendRecordsToLeader(records, isFromClient, requiredAcks) //yzhou
           val numAppendedMessages = info.numMessages
 
           // update stats for successfully appended bytes and messages as bytesInRate and messageInRate

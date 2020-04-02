@@ -736,8 +736,10 @@ class Partition(val topicPartition: TopicPartition,
     }
   }
 
+  //yzhou
   def appendRecordsToLeader(records: MemoryRecords, isFromClient: Boolean, requiredAcks: Int = 0): LogAppendInfo = {
     val (info, leaderHWIncremented) = inReadLock(leaderIsrUpdateLock) {
+      //leader分区在不在本地BrokerId上
       leaderReplicaIfLocal match {
         case Some(leaderReplica) =>
           val log = leaderReplica.log.get
@@ -745,11 +747,14 @@ class Partition(val topicPartition: TopicPartition,
           val inSyncSize = inSyncReplicas.size
 
           // Avoid writing to leader if there are not enough insync replicas to make it safe
+          //Producer 配置min.insync.replicas 最小同步副本数， 在acks=-1，默认同步全部副本，所以isr不能小于 最小同步副本数，这样无法达到Producer的配置
           if (inSyncSize < minIsr && requiredAcks == -1) {
             throw new NotEnoughReplicasException(s"The size of the current ISR ${inSyncReplicas.map(_.brokerId)} " +
               s"is insufficient to satisfy the min.isr requirement of $minIsr for partition $topicPartition")
           }
 
+          //yzhou
+          println("yzhou interBrokerProtocolVersion: "+interBrokerProtocolVersion)
           val info = log.appendAsLeader(records, leaderEpoch = this.leaderEpoch, isFromClient,
             interBrokerProtocolVersion)
 

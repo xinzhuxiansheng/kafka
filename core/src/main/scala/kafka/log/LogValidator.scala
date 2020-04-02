@@ -46,6 +46,7 @@ private[kafka] object LogValidator extends Logging {
    * Returns a ValidationAndOffsetAssignResult containing the validated message set, maximum timestamp, the offset
    * of the shallow message with the max timestamp and a boolean indicating whether the message sizes may have changed.
    */
+    //yzhou
   private[kafka] def validateMessagesAndAssignOffsets(records: MemoryRecords,
                                                       offsetCounter: LongRef,
                                                       time: Time,
@@ -69,6 +70,7 @@ private[kafka] object LogValidator extends Logging {
         assignOffsetsNonCompressed(records, offsetCounter, now, compactedTopic, timestampType, timestampDiffMaxMs,
           partitionLeaderEpoch, isFromClient, magic)
     } else {
+      //yzhou
       validateMessagesAndAssignOffsetsCompressed(records, offsetCounter, time, now, sourceCodec, targetCodec, compactedTopic,
         magic, timestampType, timestampDiffMaxMs, partitionLeaderEpoch, isFromClient, interBrokerProtocolVersion)
     }
@@ -236,6 +238,7 @@ private[kafka] object LogValidator extends Logging {
    * 3. When magic value to use is above 0, but some fields of inner messages need to be overwritten.
    * 4. Message format conversion is needed.
    */
+    //yzhou
   def validateMessagesAndAssignOffsetsCompressed(records: MemoryRecords,
                                                  offsetCounter: LongRef,
                                                  time: Time,
@@ -259,6 +262,7 @@ private[kafka] object LogValidator extends Logging {
       var uncompressedSizeInBytes = 0
 
       for (batch <- records.batches.asScala) {
+        //yzhou 验证消息合法性，主要是区分版本差异带来的兼容
         validateBatch(batch, isFromClient, toMagic)
         uncompressedSizeInBytes += AbstractRecords.recordBatchHeaderSizeInBytes(toMagic, batch.compressionType())
 
@@ -300,6 +304,7 @@ private[kafka] object LogValidator extends Logging {
           val first = records.batches.asScala.head
           (first.producerId, first.producerEpoch, first.baseSequence, first.isTransactional)
         }
+        //yzhou
         buildRecordsAndAssignOffsets(toMagic, offsetCounter, time, timestampType, CompressionType.forId(targetCodec.codec), now,
           validatedRecords, producerId, producerEpoch, sequence, isTransactional, partitionLeaderEpoch, isFromClient,
           uncompressedSizeInBytes)
@@ -328,7 +333,7 @@ private[kafka] object LogValidator extends Logging {
       }
   }
 
-  private def buildRecordsAndAssignOffsets(magic: Byte,
+  private def buildRecordsAndAssignOffsets(magic: Byte, //yzhou
                                            offsetCounter: LongRef,
                                            time: Time,
                                            timestampType: TimestampType,

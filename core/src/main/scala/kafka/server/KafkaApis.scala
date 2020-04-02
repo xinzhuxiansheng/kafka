@@ -81,7 +81,7 @@ class KafkaApis(val requestChannel: RequestChannel,
                 val config: KafkaConfig,
                 val metadataCache: MetadataCache,
                 val metrics: Metrics,
-                val authorizer: Option[Authorizer],
+                val authorizer: Option[Authorizer],    //authorizer.class.name=kafka.security.auth.SimpleAclAuthorizer
                 val quotas: QuotaManagers,
                 val fetchManager: FetchManager,
                 brokerTopicStats: BrokerTopicStats,
@@ -392,6 +392,7 @@ class KafkaApis(val requestChannel: RequestChannel,
   /**
    * Handle a produce request
    */
+    //yzhou
   def handleProduceRequest(request: RequestChannel.Request) {
     val produceRequest = request.body[ProduceRequest]
     val numBytesAppended = request.header.toStruct.sizeOf + request.sizeOfBodyInBytes
@@ -497,9 +498,12 @@ class KafkaApis(val requestChannel: RequestChannel,
     if (authorizedRequestInfo.isEmpty)
       sendResponseCallback(Map.empty)
     else {
+      //yzhou
+      info(s"request.header.clientId: ${request.header.correlationId} , AdminClientId: ${AdminUtils.AdminClientId}")
       val internalTopicsAllowed = request.header.clientId == AdminUtils.AdminClientId
 
       // call the replica manager to append messages to the replicas
+      //yzhou
       replicaManager.appendRecords(
         timeout = produceRequest.timeout.toLong,
         requiredAcks = produceRequest.acks,

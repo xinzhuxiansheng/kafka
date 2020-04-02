@@ -281,6 +281,7 @@ abstract class AbstractFetcherThread(name: String,
     } catch {
       case t: Throwable =>
         if (isRunning) {
+          //yzhou0324
           warn(s"Error in response for fetch request $fetchRequest", t)
           inLock(partitionMapLock) {
             partitionsWithError ++= partitionStates.partitionSet.asScala
