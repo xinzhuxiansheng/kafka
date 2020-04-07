@@ -738,6 +738,7 @@ class ReplicaManager(val config: KafkaConfig,
                                entriesPerPartition: Map[TopicPartition, MemoryRecords],
                                requiredAcks: Short): Map[TopicPartition, LogAppendResult] = {
     trace(s"Append [$entriesPerPartition] to local log")
+    info(s"yzhou entriesPerPartition $entriesPerPartition  entriesPerPartition.size ${entriesPerPartition.size}")
     entriesPerPartition.map { case (topicPartition, records) =>
       brokerTopicStats.topicStats(topicPartition.topic).totalProduceRequestRate.mark()
       brokerTopicStats.allTopicsStats.totalProduceRequestRate.mark()

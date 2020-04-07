@@ -504,6 +504,7 @@ class KafkaApis(val requestChannel: RequestChannel,
 
       // call the replica manager to append messages to the replicas
       //yzhou
+      info(s"yzhou authorizedRequestInfo.size ${authorizedRequestInfo.size}")
       replicaManager.appendRecords(
         timeout = produceRequest.timeout.toLong,
         requiredAcks = produceRequest.acks,

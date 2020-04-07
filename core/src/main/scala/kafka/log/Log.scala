@@ -851,6 +851,11 @@ class Log(@volatile var dir: File,
       val appendInfo = analyzeAndValidateRecords(records, isFromClient = isFromClient)
 
       // return if we have no valid messages or if this is a duplicate of the last appended entry
+      //shallowCount=1 表示包含有效数据
+      //LogAppendInfo: firstOffset: Some(0) ,lastOffset: 9 ,maxTimestamp: 1586169560920 ,RecordBatch.NO_TIMESTAMP: -1, logStartOffset: 0,
+      // RecordConversionStats.EMPTY: RecordConversionStats(temporaryMemoryBytes=0, numRecordsConverted=0, conversionTimeNanos=0),
+      // sourceCodec: GZIPCompressionCodec, targetCodec: GZIPCompressionCodec, shallowMessageCount: 1,validBytesCount: 256, monotonic: true,
+      // lastOffsetOfFirstBatch: 9 (kafka.log.Log)
       if (appendInfo.shallowCount == 0)
         return appendInfo
 
@@ -861,9 +866,12 @@ class Log(@volatile var dir: File,
       // they are valid, insert them in the log
       lock synchronized {
         checkIfMemoryMappedBufferClosed()
+        info(s"yzhou assignOffsets $assignOffsets")
         if (assignOffsets) {
           // assign offsets to the message set
           val offset = new LongRef(nextOffsetMetadata.messageOffset)
+          //yzhou
+          info(s"yzhou assignOffsets offset : ${offset.value}")
           appendInfo.firstOffset = Some(offset.value)
           val now = time.milliseconds
           val validateAndOffsetAssignResult = try {
@@ -882,7 +890,7 @@ class Log(@volatile var dir: File,
               leaderEpoch,
               isFromClient,
               interBrokerProtocolVersion)
-          } catch {
+          } catch {commit-latency-avg
             case e: IOException =>
               throw new KafkaException(s"Error validating messages while appending to log $name", e)
           }
@@ -1135,6 +1143,7 @@ class Log(@volatile var dir: File,
     var readFirstMessage = false
     var lastOffsetOfFirstBatch = -1L
 
+    info(s"yzhou Log records.batches.asScala: ${records.batches().asScala.size}")
     for (batch <- records.batches.asScala) {
       // we only validate V2 and higher to avoid potential compatibility issues with older clients
       if (batch.magic >= RecordBatch.MAGIC_VALUE_V2 && isFromClient && batch.baseOffset != 0)
@@ -1191,6 +1200,11 @@ class Log(@volatile var dir: File,
     //broker 如果配置全局 record的压缩格，按照broker标准走
     // Apply broker-side compression if any
     val targetCodec = BrokerCompressionCodec.getTargetCompressionCodec(config.compressionType, sourceCodec)
+
+    info(s"yzhou LogAppendInfo: firstOffset: $firstOffset ,lastOffset: $lastOffset ,maxTimestamp: $maxTimestamp ," +
+      s"RecordBatch.NO_TIMESTAMP: ${RecordBatch.NO_TIMESTAMP}, logStartOffset: $logStartOffset,"+
+        s"RecordConversionStats.EMPTY: ${RecordConversionStats.EMPTY}, sourceCodec: $sourceCodec, targetCodec: $targetCodec, shallowMessageCount: $shallowMessageCount,"+
+      s"validBytesCount: $validBytesCount, monotonic: $monotonic, lastOffsetOfFirstBatch: $lastOffsetOfFirstBatch")
     LogAppendInfo(firstOffset, lastOffset, maxTimestamp, offsetOfMaxTimestamp, RecordBatch.NO_TIMESTAMP, logStartOffset,
       RecordConversionStats.EMPTY, sourceCodec, targetCodec, shallowMessageCount, validBytesCount, monotonic, lastOffsetOfFirstBatch)
   }

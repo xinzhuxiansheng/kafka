@@ -261,6 +261,7 @@ private[kafka] object LogValidator extends Logging {
 
       var uncompressedSizeInBytes = 0
 
+      info(s"yzhou LogValidator records.batches.asScala: ${records.batches().asScala.size}")
       for (batch <- records.batches.asScala) {
         //yzhou 验证消息合法性，主要是区分版本差异带来的兼容
         validateBatch(batch, isFromClient, toMagic)
@@ -279,6 +280,8 @@ private[kafka] object LogValidator extends Logging {
           validateRecord(batch, record, now, timestampType, timestampDiffMaxMs, compactedTopic)
 
           uncompressedSizeInBytes += record.sizeInBytes()
+          //info(s"yzhou batch.magic: ${batch.magic()} toMagic: $toMagic")
+          //batch.magic: 2 toMagic: 2 (kafka.log.LogValidator$)
           if (batch.magic > RecordBatch.MAGIC_VALUE_V0 && toMagic > RecordBatch.MAGIC_VALUE_V0) {
             // Check if we need to overwrite offset
             // No in place assignment situation 3
@@ -296,6 +299,7 @@ private[kafka] object LogValidator extends Logging {
         }
       }
 
+      info(s"yzhou inPlaceAssignment: $inPlaceAssignment")
       if (!inPlaceAssignment) {
         val (producerId, producerEpoch, sequence, isTransactional) = {
           // note that we only reassign offsets for requests coming straight from a producer. For records with magic V2,
@@ -304,7 +308,7 @@ private[kafka] object LogValidator extends Logging {
           val first = records.batches.asScala.head
           (first.producerId, first.producerEpoch, first.baseSequence, first.isTransactional)
         }
-        //yzhou
+
         buildRecordsAndAssignOffsets(toMagic, offsetCounter, time, timestampType, CompressionType.forId(targetCodec.codec), now,
           validatedRecords, producerId, producerEpoch, sequence, isTransactional, partitionLeaderEpoch, isFromClient,
           uncompressedSizeInBytes)
