@@ -890,7 +890,7 @@ class Log(@volatile var dir: File,
               leaderEpoch,
               isFromClient,
               interBrokerProtocolVersion)
-          } catch {commit-latency-avg
+          } catch {
             case e: IOException =>
               throw new KafkaException(s"Error validating messages while appending to log $name", e)
           }

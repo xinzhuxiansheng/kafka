@@ -684,7 +684,12 @@ public class KafkaConsumer<K, V> implements Consumer<K, V> {
             this.defaultApiTimeoutMs = config.getInt(ConsumerConfig.DEFAULT_API_TIMEOUT_MS_CONFIG);
             this.time = Time.SYSTEM;
 
-            Map<String, String> metricsTags = Collections.singletonMap("client-id", clientId);
+            //Map<String, String> metricsTags = Collections.singletonMap("client-id", clientId);
+            //yzhou
+            Map<String, String> metricsTags = new HashMap<String,String>();
+            metricsTags.put("client-id",clientId);
+            metricsTags.put("group-id",groupId);
+
             MetricConfig metricConfig = new MetricConfig().samples(config.getInt(ConsumerConfig.METRICS_NUM_SAMPLES_CONFIG))
                     .timeWindow(config.getLong(ConsumerConfig.METRICS_SAMPLE_WINDOW_MS_CONFIG), TimeUnit.MILLISECONDS)
                     .recordLevel(Sensor.RecordingLevel.forName(config.getString(ConsumerConfig.METRICS_RECORDING_LEVEL_CONFIG)))
