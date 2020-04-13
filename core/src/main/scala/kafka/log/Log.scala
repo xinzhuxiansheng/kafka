@@ -1174,6 +1174,7 @@ class Log(@volatile var dir: File,
       // Check if the message sizes are valid.
       //yzhou 检查当前每条消息字节大小，是否超过设定的maxMessageSize
       val batchSize = batch.sizeInBytes
+      //yhou 单条消息 不能超过 max.message.bytes配置的字节大小
       if (batchSize > config.maxMessageSize) {
         brokerTopicStats.topicStats(topicPartition.topic).bytesRejectedRate.mark(records.sizeInBytes)
         brokerTopicStats.allTopicsStats.bytesRejectedRate.mark(records.sizeInBytes)

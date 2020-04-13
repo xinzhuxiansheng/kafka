@@ -635,6 +635,7 @@ public class MemoryRecordsBuilder implements AutoCloseable {
     }
 
     private long appendLegacyRecord(long offset, long timestamp, ByteBuffer key, ByteBuffer value) throws IOException {
+        //yzhou 判断 MemoryRecordsBuilder 是否close
         ensureOpenForRecordAppend();
         if (compressionType == CompressionType.NONE && timestampType == TimestampType.LOG_APPEND_TIME)
             timestamp = logAppendTime;

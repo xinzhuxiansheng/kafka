@@ -139,7 +139,7 @@ public class DefaultRecordBatch extends AbstractRecordBatch implements MutableRe
     }
 
     @Override
-    public void ensureValid() {
+    public void ensureValid() { //yzhou
         if (sizeInBytes() < RECORD_BATCH_OVERHEAD)
             throw new InvalidRecordException("Record batch is corrupt (the size " + sizeInBytes() +
                     " is smaller than the minimum allowed overhead " + RECORD_BATCH_OVERHEAD + ")");

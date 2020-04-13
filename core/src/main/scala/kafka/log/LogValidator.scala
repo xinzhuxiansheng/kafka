@@ -76,6 +76,7 @@ private[kafka] object LogValidator extends Logging {
     }
   }
 
+  //验证当前RecordBatch的magic 如何v1不支持事务，不允许写control records
   private def validateBatch(batch: RecordBatch, isFromClient: Boolean, toMagic: Byte): Unit = {
     if (isFromClient) {
       if (batch.magic >= RecordBatch.MAGIC_VALUE_V2) {
@@ -108,6 +109,7 @@ private[kafka] object LogValidator extends Logging {
       throw new UnsupportedForMessageFormatException(s"Idempotent records cannot be used with magic version $toMagic")
   }
 
+  //yzhou 从消息的cleanup.policy=compact 清理策略和 message.timestamp.difference.max.ms 消息处理的时间差(只有当消息的timestamp配置为 createtime 才生效)
   private def validateRecord(batch: RecordBatch, record: Record, now: Long, timestampType: TimestampType,
                              timestampDiffMaxMs: Long, compactedTopic: Boolean): Unit = {
     if (!record.hasMagic(batch.magic))
@@ -120,7 +122,9 @@ private[kafka] object LogValidator extends Logging {
     if (batch.magic <= RecordBatch.MAGIC_VALUE_V1 && batch.isCompressed)
       record.ensureValid()
 
+    //yzhou conpact的清理策略保证record 要有key
     validateKey(record, compactedTopic)
+    //yzhou 消息正在使用create time，则判断写入消息时间 是否在 message.timestamp.difference.max.ms 配置项的范围内
     validateTimestamp(batch, record, now, timestampType, timestampDiffMaxMs)
   }
 
@@ -183,12 +187,14 @@ private[kafka] object LogValidator extends Logging {
     val initialOffset = offsetCounter.value
 
     for (batch <- records.batches.asScala) {
+      //yzhou 验证当前RecordBatch的magic 如何v1不支持事务，不允许写control records
       validateBatch(batch, isFromClient, magic)
 
       var maxBatchTimestamp = RecordBatch.NO_TIMESTAMP
       var offsetOfMaxBatchTimestamp = -1L
 
       for (record <- batch.asScala) {
+        //yzhou 从消息的cleanup.policy=compact 清理策略和 message.timestamp.difference.max.ms 消息处理的时间差(只有当消息的timestamp配置为 createtime 才生效)
         validateRecord(batch, record, now, timestampType, timestampDiffMaxMs, compactedTopic)
         val offset = offsetCounter.getAndIncrement()
         if (batch.magic > RecordBatch.MAGIC_VALUE_V0 && record.timestamp > maxBatchTimestamp) {
@@ -277,6 +283,7 @@ private[kafka] object LogValidator extends Logging {
               s"compression attribute set: $record")
           if (targetCodec == ZStdCompressionCodec && interBrokerProtocolVersion < KAFKA_2_1_IV0)
             throw new UnsupportedCompressionTypeException("Produce requests to inter.broker.protocol.version < 2.1 broker " + "are not allowed to use ZStandard compression")
+          //yzhou 从消息的cleanup.policy=compact 清理策略和 message.timestamp.difference.max.ms 消息处理的时间差(只有当消息的timestamp配置为 createtime 才生效)
           validateRecord(batch, record, now, timestampType, timestampDiffMaxMs, compactedTopic)
 
           uncompressedSizeInBytes += record.sizeInBytes()
@@ -382,6 +389,7 @@ private[kafka] object LogValidator extends Logging {
       recordConversionStats = recordConversionStats)
   }
 
+  //yzhou Kafka提供了两种日志清理策略  cleanup.policy=compact 配置topic是否压缩， conpact的清理策略保证record 要有key
   private def validateKey(record: Record, compactedTopic: Boolean) {
     if (compactedTopic && !record.hasKey)
       throw new InvalidRecordException("Compacted topic cannot accept message without key.")
