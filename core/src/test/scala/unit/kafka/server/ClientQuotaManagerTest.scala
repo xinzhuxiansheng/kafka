@@ -277,27 +277,37 @@ class ClientQuotaManagerTest {
         time.sleep(1000)
       }
       assertEquals(0, queueSizeMetric.metricValue.asInstanceOf[Double].toInt)
+      System.out.println("-----------------------------");
 
       // Create a spike.
       // 400*10 + 2000 + 300 = 6300/10.5 = 600 bytes per second.
+      //yzhou O(当前值) * W(时间段) = (W(时间段) + X(还需要延迟的时间)) * T(阈值)   -->   X = (O - T) / T * W
+      //yzhou ClientQuotaManagerTest 默认是 500
+      //yzhou private val config = ClientQuotaManagerConfig(quotaBytesPerSecondDefault = 500)
+      //yzhou ClientQuotaManagerConfig(500,11,1)
+      //yzhou MetricName [name=byte-rate, group=Produce, description=Tracking byte-rate per user/client-id, tags={user=, client-id=unknown}]
       // (600 - quota)/quota*window-size = (600-500)/500*10.5 seconds = 2100
       // 10.5 seconds because the last window is half complete
       time.sleep(500)
       val sleepTime = maybeRecord(clientMetrics, "ANONYMOUS", "unknown", 2300)
+      System.out.println("1111111111111111111111111");
 
       assertEquals("Should be throttled", 2100, sleepTime)
       throttle(clientMetrics, "ANONYMOYUS", "unknown", sleepTime, callback)
       assertEquals(1, queueSizeMetric.metricValue.asInstanceOf[Double].toInt)
+      //yzhou 请求被延迟后，不能立即触发回调,sleepTime后 执行doWork(),所以线程还停留一个
       // After a request is delayed, the callback cannot be triggered immediately
       clientMetrics.throttledChannelReaper.doWork()
       assertEquals(0, numCallbacks)
       time.sleep(sleepTime)
 
+      //yzhou 回调只能在延迟时间过后触发
       // Callback can only be triggered after the delay time passes
       clientMetrics.throttledChannelReaper.doWork()
       assertEquals(0, queueSizeMetric.metricValue.asInstanceOf[Double].toInt)
       assertEquals(1, numCallbacks)
 
+      System.out.println("*******************************");
       // Could continue to see delays until the bursty sample disappears
       for (_ <- 0 until 10) {
         maybeRecord(clientMetrics, "ANONYMOUS", "unknown", 400)

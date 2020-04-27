@@ -82,7 +82,7 @@ class KafkaApis(val requestChannel: RequestChannel,
                 val metadataCache: MetadataCache,
                 val metrics: Metrics,
                 val authorizer: Option[Authorizer],    //authorizer.class.name=kafka.security.auth.SimpleAclAuthorizer
-                val quotas: QuotaManagers,
+                val quotas: QuotaManagers,    //kafka 配额管理
                 val fetchManager: FetchManager,
                 brokerTopicStats: BrokerTopicStats,
                 val clusterId: String,

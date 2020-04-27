@@ -62,7 +62,7 @@ public class Rate implements MeasurableStat {
     }
 
     @Override
-    public double measure(MetricConfig config, long now) {
+    public double measure(MetricConfig config, long now) { //yzhou
         double value = stat.measure(config, now);
         return value / convert(windowSize(config, now));
     }
@@ -94,7 +94,7 @@ public class Rate implements MeasurableStat {
         return totalElapsedTimeMs;
     }
 
-    private double convert(long timeMs) {
+    private double convert(long timeMs) { //yzhou
         switch (unit) {
             case NANOSECONDS:
                 return timeMs * 1000.0 * 1000.0;
@@ -127,7 +127,7 @@ public class Rate implements MeasurableStat {
         }
 
         @Override
-        public double combine(List<Sample> samples, MetricConfig config, long now) {
+        public double combine(List<Sample> samples, MetricConfig config, long now) { //yzhou
             double total = 0.0;
             for (Sample sample : samples)
                 total += sample.value;

@@ -174,11 +174,11 @@ public final class Sensor {
      * @throws QuotaViolationException if recording this value moves a metric beyond its configured maximum or minimum
      *         bound
      */
-    public void record(double value, long timeMs) {
+    public void record(double value, long timeMs) {  //yzhou
         record(value, timeMs, true);
     }
 
-    public void record(double value, long timeMs, boolean checkQuotas) {
+    public void record(double value, long timeMs, boolean checkQuotas) { //yzhou
         if (shouldRecord()) {
             this.lastRecordTime = timeMs;
             synchronized (this) {
@@ -188,7 +188,7 @@ public final class Sensor {
                         stat.record(config, value, timeMs);
                 }
                 if (checkQuotas)
-                    checkQuotas(timeMs);
+                    checkQuotas(timeMs);   //yzhou
             }
             for (Sensor parent : parents)
                 parent.record(value, timeMs, checkQuotas);
@@ -202,13 +202,14 @@ public final class Sensor {
         checkQuotas(time.milliseconds());
     }
 
-    public void checkQuotas(long timeMs) {
+    public void checkQuotas(long timeMs) { //yzhou
         for (KafkaMetric metric : this.metrics.values()) {
             MetricConfig config = metric.config();
             if (config != null) {
                 Quota quota = config.quota();
                 if (quota != null) {
                     double value = metric.measurableValue(timeMs);
+                    System.out.println("checkQuotas value: "+value);
                     if (!quota.acceptable(value)) {
                         throw new QuotaViolationException(metric.metricName(), value,
                             quota.bound());

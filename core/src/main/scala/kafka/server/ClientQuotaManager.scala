@@ -197,6 +197,7 @@ class ClientQuotaManager(private val config: ClientQuotaManagerConfig,
       if (throttledChannel != null) {
         // Decrement the size of the delay queue
         delayQueueSensor.record(-1)
+        //yzhou 通知套接字服务器对这个通道进行了节流，以便它可以尝试取消通道的静音
         // Notify the socket server that throttling is done for this channel, so that it can try to unmute the channel.
         throttledChannel.notifyThrottlingDone()
       }
@@ -504,7 +505,7 @@ class ClientQuotaManager(private val config: ClientQuotaManagerConfig,
     }
   }
 
-  protected def clientRateMetricName(quotaMetricTags: Map[String, String]): MetricName = {
+  protected def clientRateMetricName(quotaMetricTags: Map[String, String]): MetricName = { //yzhou
     metrics.metricName("byte-rate", quotaType.toString,
       "Tracking byte-rate per user/client-id",
       quotaMetricTags.asJava)
