@@ -758,7 +758,8 @@ public final class ConsumerCoordinator extends AbstractCoordinator {
                         || error == Errors.NOT_COORDINATOR_FOR_GROUP
                         || error == Errors.REQUEST_TIMED_OUT) {
                     log.debug("Offset commit for group {} failed: {}", groupId, error.message());
-                    coordinatorDead();
+                    log.info("yzhou ConsumerCoordinator 761");
+                    coordinatorDead();//yzhou
                     future.raise(error);
                     return;
                 } else if (error == Errors.UNKNOWN_MEMBER_ID
@@ -823,7 +824,8 @@ public final class ConsumerCoordinator extends AbstractCoordinator {
                     future.raise(error);
                 } else if (error == Errors.NOT_COORDINATOR_FOR_GROUP) {
                     // re-discover the coordinator and retry
-                    coordinatorDead();
+                    log.info("yzhou ConsumerCoordinator 827");
+                    coordinatorDead();//yzhou
                     future.raise(error);
                 } else if (error == Errors.GROUP_AUTHORIZATION_FAILED) {
                     future.raise(new GroupAuthorizationException(groupId));

@@ -219,7 +219,8 @@ public abstract class AbstractCoordinator implements Closeable {
             } else if (coordinator != null && client.connectionFailed(coordinator)) {
                 // we found the coordinator, but the connection has failed, so mark
                 // it dead and backoff before retrying discovery
-                coordinatorDead();
+                log.info("yzhou AbstractCoordinator 222");
+                coordinatorDead();//yzhou
                 time.sleep(retryBackoffMs);
             }
 
@@ -467,7 +468,8 @@ public abstract class AbstractCoordinator implements Closeable {
             } else if (error == Errors.GROUP_COORDINATOR_NOT_AVAILABLE
                     || error == Errors.NOT_COORDINATOR_FOR_GROUP) {
                 // re-discover the coordinator and retry with backoff
-                coordinatorDead();
+                log.info("yzhou AbstractCoordinator 471");
+                coordinatorDead();//yzhou
                 log.debug("Attempt to join group {} failed due to obsolete coordinator information: {}", groupId, error.message());
                 future.raise(error);
             } else if (error == Errors.INCONSISTENT_GROUP_PROTOCOL
@@ -542,7 +544,8 @@ public abstract class AbstractCoordinator implements Closeable {
                 } else if (error == Errors.GROUP_COORDINATOR_NOT_AVAILABLE
                         || error == Errors.NOT_COORDINATOR_FOR_GROUP) {
                     log.debug("SyncGroup for group {} failed due to {}", groupId, error);
-                    coordinatorDead();
+                    log.info("yzhou AbstractCoordinator 547");
+                    coordinatorDead();//yzhou
                     future.raise(error);
                 } else {
                     future.raise(new KafkaException("Unexpected error from SyncGroup: " + error.message()));
@@ -617,7 +620,8 @@ public abstract class AbstractCoordinator implements Closeable {
      */
     protected synchronized Node coordinator() {
         if (coordinator != null && client.connectionFailed(coordinator)) {
-            coordinatorDead();
+            log.info("yzhou AbstractCoordinator 623");
+            coordinatorDead();//yzhou
             return null;
         }
         return this.coordinator;
@@ -740,7 +744,8 @@ public abstract class AbstractCoordinator implements Closeable {
                     || error == Errors.NOT_COORDINATOR_FOR_GROUP) {
                 log.debug("Attempt to heartbeat failed for group {} since coordinator {} is either not started or not valid.",
                         groupId, coordinator());
-                coordinatorDead();
+                log.info("yzhou AbstractCoordinator 747");
+                coordinatorDead();//yzhou
                 future.raise(error);
             } else if (error == Errors.REBALANCE_IN_PROGRESS) {
                 log.debug("Attempt to heartbeat failed for group {} since it is rebalancing.", groupId);
@@ -770,8 +775,9 @@ public abstract class AbstractCoordinator implements Closeable {
         @Override
         public void onFailure(RuntimeException e, RequestFuture<T> future) {
             // mark the coordinator as dead
+            log.info("yzhou AbstractCoordinator 222");
             if (e instanceof DisconnectException)
-                coordinatorDead();
+                coordinatorDead();//yzhou
             future.raise(e);
         }
 
@@ -915,7 +921,8 @@ public abstract class AbstractCoordinator implements Closeable {
                         } else if (heartbeat.sessionTimeoutExpired(now)) {
                             // the session timeout has expired without seeing a successful heartbeat, so we should
                             // probably make sure the coordinator is still healthy.
-                            coordinatorDead();
+                            log.info("yzhou AbstractCoordinator 924");
+                            coordinatorDead();//yzhou
                         } else if (heartbeat.pollTimeoutExpired(now)) {
                             // the poll timeout has expired, which means that the foreground thread has stalled
                             // in between calls to poll(), so we explicitly leave the group.
