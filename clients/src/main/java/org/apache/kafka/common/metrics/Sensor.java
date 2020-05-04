@@ -209,7 +209,7 @@ public final class Sensor {
                 Quota quota = config.quota();
                 if (quota != null) {
                     double value = metric.measurableValue(timeMs);
-                    System.out.println("checkQuotas value: "+value);
+                    //System.out.println("checkQuotas value: "+value);
                     if (!quota.acceptable(value)) {
                         throw new QuotaViolationException(metric.metricName(), value,
                             quota.bound());
