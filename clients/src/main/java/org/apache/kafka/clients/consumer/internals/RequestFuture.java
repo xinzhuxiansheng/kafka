@@ -38,10 +38,14 @@ import java.util.List;
  * @param <T> Return type of the result (Can be Void if there is no response)
  */
 public class RequestFuture<T> {
-
+    // 表示当前请求是否已经完成，不管正常完成还是出现异常，此字段都会被设置为true
     private boolean isDone = false;
     private T value;
+    // 记录导致请求异常完成的异常类，与value字段互斥。
+    // 此字段非空则表示出现异常，反之则表示正常完成
     private RuntimeException exception;
+    // RequestFutureListener集合，用来监听请求完成的情况。
+    // RequestFutureListener接口有onSuccess()和onFailure()，对应于请求正常完成和出现异常两种情况
     private List<RequestFutureListener<T>> listeners = new ArrayList<>();
 
 
@@ -176,14 +180,16 @@ public class RequestFuture<T> {
     }
 
     public void chain(final RequestFuture<T> future) {
-        addListener(new RequestFutureListener<T>() {
+        addListener(new RequestFutureListener<T>() {// 添加监听器
             @Override
             public void onSuccess(T value) {
+                // 通过监听器将value传递给下一个RequestFuture对象
                 future.complete(value);
             }
 
             @Override
             public void onFailure(RuntimeException e) {
+                // 通过监听器将异常传递给下一个RequestFuture对象
                 future.raise(e);
             }
         });
