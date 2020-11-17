@@ -194,7 +194,7 @@ class CachedPartition(val topic: String,
   *                     FetchSessionCache#touch.
   * @param epoch        The fetch session sequence number.
   */
-case class FetchSession(val id: Int,
+case class FetchSession(val id: Int, // session编号是随机32位数字，防止未授权的客户端伪造数据
                         val privileged: Boolean,
                         val partitionMap: FetchSession.CACHE_MAP,
                         val creationMs: Long,

@@ -950,11 +950,11 @@ class Partition(val topicPartition: TopicPartition,
     * @param offset offset to be used for truncation
     * @param isFuture True iff the truncation should be performed on the future log of this partition
     */
-  def truncateTo(offset: Long, isFuture: Boolean) {
+  def truncateTo(offset: Long, isFuture: Boolean) { //yzhou
     // The read lock is needed to prevent the follower replica from being truncated while ReplicaAlterDirThread
     // is executing maybeDeleteAndSwapFutureReplica() to replace follower replica with the future replica.
     inReadLock(leaderIsrUpdateLock) {
-      logManager.truncateTo(Map(topicPartition -> offset), isFuture = isFuture)
+      logManager.truncateTo(Map(topicPartition -> offset), isFuture = isFuture) //yzhou
     }
   }
 

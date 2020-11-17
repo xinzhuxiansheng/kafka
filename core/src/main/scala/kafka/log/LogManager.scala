@@ -512,7 +512,7 @@ class LogManager(logDirs: Seq[File],
         if (needToStopCleaner && !isFuture)
           cleaner.abortAndPauseCleaning(topicPartition)
         try {
-          if (log.truncateTo(truncateOffset))
+          if (log.truncateTo(truncateOffset)) //yzhou
             affectedLogs += log
           if (needToStopCleaner && !isFuture)
             cleaner.maybeTruncateCheckpoint(log.dir.getParentFile, topicPartition, log.activeSegment.baseOffset)

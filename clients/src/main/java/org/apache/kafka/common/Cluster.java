@@ -37,7 +37,7 @@ public final class Cluster {
     private final boolean isBootstrapConfigured;
     private final List<Node> nodes;
     private final Set<String> unauthorizedTopics;
-    private final Set<String> invalidTopics;
+    private final Set<String> invalidTopics;  // TODO 存的是什么Topics
     private final Set<String> internalTopics;
     private final Node controller;
     private final Map<TopicPartition, PartitionInfo> partitionsByTopicPartition;

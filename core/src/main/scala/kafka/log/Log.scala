@@ -1533,6 +1533,10 @@ class Log(@volatile var dir: File,
    */
   private def deletableSegments(predicate: (LogSegment, Option[LogSegment]) => Boolean): Iterable[LogSegment] = {
     if (segments.isEmpty || replicaHighWatermark.isEmpty) {
+      if(isMessageTopic()){
+        debug(s"topic: ${this.topicPartition.topic()} ,partition : ${this.topicPartition.partition()} ,segments.isEmpty(): ${segments.isEmpty} , " +
+          s"replicaHighWatermark.isEmpty(): ${replicaHighWatermark.isEmpty}")
+      }
       Seq.empty
     } else {
       val highWatermark = replicaHighWatermark.get
@@ -1546,9 +1550,16 @@ class Log(@volatile var dir: File,
         else
           (null, logEndOffset, segment.size == 0)
 
+        if(isMessageTopic()){
+          debug(s"nextSegment !=null ${nextSegment!=null} , hightWatermark: $highWatermark, upperBoundOffset: $upperBoundOffset, predicateResult: " +
+            s"${predicate(segment, Option(nextSegment))} ,segment largest : ${segment.largestTimestamp} ,isLastSegmentAndEmpty: $isLastSegmentAndEmpty")
+        }
         if (highWatermark >= upperBoundOffset && predicate(segment, Option(nextSegment)) && !isLastSegmentAndEmpty) {
           deletable += segment
           segmentEntry = nextSegmentEntry
+          if(isMessageTopic()){
+            debug(s"log deletable added")
+          }
         } else {
           segmentEntry = null
         }
@@ -1564,15 +1575,28 @@ class Log(@volatile var dir: File,
    * Whether or not deletion is enabled, delete any log segments that are before the log start offset
    */
   def deleteOldSegments(): Int = {
+    //TODO
     if (config.delete) {
+      if(isMessageTopic()){
+        debug(s"message into deleteOldSegments() , config.delete=true")
+      }
       deleteRetentionMsBreachedSegments() + deleteRetentionSizeBreachedSegments() + deleteLogStartOffsetBreachedSegments()
     } else {
       deleteLogStartOffsetBreachedSegments()
     }
   }
 
+  def isMessageTopic(): Boolean = {
+    this.topicPartition.topic().equals("message")
+  }
+
   private def deleteRetentionMsBreachedSegments(): Int = {
-    if (config.retentionMs < 0) return 0
+    if (config.retentionMs < 0) {
+      if(isMessageTopic()){
+        debug(s"message topic into deleteRetentionMsBreachedSegments() , config.retentionms: ${config.retentionMs}")
+      }
+      return 0
+    }
     val startMs = time.milliseconds
     deleteOldSegments((segment, _) => startMs - segment.largestTimestamp > config.retentionMs,
       reason = s"retention time ${config.retentionMs}ms breach")
@@ -1855,7 +1879,7 @@ class Log(@volatile var dir: File,
    * @param targetOffset The offset to truncate to, an upper bound on all offsets in the log after truncation is complete.
    * @return True iff targetOffset < logEndOffset
    */
-  private[log] def truncateTo(targetOffset: Long): Boolean = {
+  private[log] def truncateTo(targetOffset: Long): Boolean = { //yzhou
     maybeHandleIOException(s"Error while truncating log to offset $targetOffset for $topicPartition in dir ${dir.getParent}") {
       if (targetOffset < 0)
         throw new IllegalArgumentException(s"Cannot truncate partition $topicPartition to a negative offset (%d).".format(targetOffset))

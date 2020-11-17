@@ -1082,7 +1082,7 @@ class ReplicaManager(val config: KafkaConfig,
               stateChangeLogger.warn(s"Ignoring LeaderAndIsr request from controller $controllerId with " +
                 s"correlation id $correlationId epoch $controllerEpoch for partition $topicPartition as itself is not " +
                 s"in assigned replica list ${stateInfo.basePartitionState.replicas.asScala.mkString(",")}")
-              responseMap.put(topicPartition, Errors.UNKNOWN_TOPIC_OR_PARTITION)
+              responseMap.put(topicPartition, Errors.UNKNOWN_TOPIC_OR_PARTITION)  //yzhou
             }
           } else {
             // Otherwise record the error code in response
@@ -1529,7 +1529,7 @@ class ReplicaManager(val config: KafkaConfig,
           new EpochEndOffset(Errors.NOT_LEADER_FOR_PARTITION, UNDEFINED_EPOCH, UNDEFINED_EPOCH_OFFSET)
 
         case None =>
-          new EpochEndOffset(Errors.UNKNOWN_TOPIC_OR_PARTITION, UNDEFINED_EPOCH, UNDEFINED_EPOCH_OFFSET)
+          new EpochEndOffset(Errors.UNKNOWN_TOPIC_OR_PARTITION, UNDEFINED_EPOCH, UNDEFINED_EPOCH_OFFSET)  //yzhou
       }
       tp -> epochEndOffset
     }

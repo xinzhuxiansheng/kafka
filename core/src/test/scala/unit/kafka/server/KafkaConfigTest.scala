@@ -681,7 +681,7 @@ class KafkaConfigTest {
         case KafkaConfig.OffsetCommitTimeoutMsProp => assertPropertyInvalid(getBaseProperties(), name, "not_a_number", "0")
         case KafkaConfig.OffsetCommitRequiredAcksProp => assertPropertyInvalid(getBaseProperties(), name, "not_a_number", "-2")
         case KafkaConfig.TransactionalIdExpirationMsProp => assertPropertyInvalid(getBaseProperties(), name, "not_a_number", "0", "-2")
-        case KafkaConfig.TransactionsMaxTimeoutMsProp => assertPropertyInvalid(getBaseProperties(), name, "not_a_number", "0", "-2")
+        case KafkaConfig.transaction.max.timeout.msTransactionsMaxTimeoutMsProp => assertPropertyInvalid(getBaseProperties(), name, "not_a_number", "0", "-2")
         case KafkaConfig.TransactionsTopicMinISRProp => assertPropertyInvalid(getBaseProperties(), name, "not_a_number", "0", "-2")
         case KafkaConfig.TransactionsLoadBufferSizeProp => assertPropertyInvalid(getBaseProperties(), name, "not_a_number", "0", "-2")
         case KafkaConfig.TransactionsTopicPartitionsProp => assertPropertyInvalid(getBaseProperties(), name, "not_a_number", "0", "-2")

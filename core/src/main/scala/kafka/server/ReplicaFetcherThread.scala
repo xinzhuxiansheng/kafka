@@ -275,7 +275,7 @@ class ReplicaFetcherThread(name: String,
   override def truncate(tp: TopicPartition, offsetTruncationState: OffsetTruncationState): Unit = {
     val replica = replicaMgr.localReplicaOrException(tp)
     val partition = replicaMgr.getPartition(tp).get
-    partition.truncateTo(offsetTruncationState.offset, isFuture = false)
+    partition.truncateTo(offsetTruncationState.offset, isFuture = false) //yzhou
 
     if (offsetTruncationState.offset < replica.highWatermark.messageOffset)
       warn(s"Truncating $tp to offset ${offsetTruncationState.offset} below high watermark " +

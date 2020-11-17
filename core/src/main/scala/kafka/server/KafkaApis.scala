@@ -768,14 +768,14 @@ class KafkaApis(val requestChannel: RequestChannel,
   def replicationQuota(fetchRequest: FetchRequest): ReplicaQuota =
     if (fetchRequest.isFromFollower) quotas.leader else UnboundedQuota
 
-  def handleListOffsetRequest(request: RequestChannel.Request) {
+  def handleListOffsetRequest(request: RequestChannel.Request) {  //yzhou
     val version = request.header.apiVersion()
 
     val mergedResponseMap = if (version == 0)
       handleListOffsetRequestV0(request)
     else
       handleListOffsetRequestV1AndAbove(request)
-
+    // 发送普通Response但接受限流的约束
     sendResponseMaybeThrottle(request, requestThrottleMs => new ListOffsetResponse(requestThrottleMs, mergedResponseMap.asJava))
   }
 

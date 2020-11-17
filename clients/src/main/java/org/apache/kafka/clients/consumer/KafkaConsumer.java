@@ -1182,8 +1182,10 @@ public class KafkaConsumer<K, V> implements Consumer<K, V> {
     }
 
     private ConsumerRecords<K, V> poll(final Timer timer, final boolean includeMetadataInTimeout) {
+        //yzhou 确保KafkaConsumer 不能被多线程同时访问
         acquireAndEnsureOpen();
         try {
+            //yzhou 检查是否订阅了topic
             if (this.subscriptions.hasNoSubscriptionOrUserAssignment()) {
                 throw new IllegalStateException("Consumer is not subscribed to any topics or assigned any partitions");
             }

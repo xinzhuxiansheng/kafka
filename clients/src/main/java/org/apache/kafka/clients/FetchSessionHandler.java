@@ -195,11 +195,11 @@ public class FetchSessionHandler {
         }
 
         public FetchRequestData build() {
-            if (nextMetadata.isFull()) {
+            if (nextMetadata.isFull()) {  //epoch=0或者-1
                 log.debug("Built full fetch {} for node {} with {}.",
                     nextMetadata, node, partitionsToLogString(next.keySet()));
-                sessionPartitions = next;
-                next = null;
+                sessionPartitions = next; // next为之前调用add添加的分区
+                next = null; //本地full拉取，下次next=null
                 Map<TopicPartition, PartitionData> toSend =
                     Collections.unmodifiableMap(new LinkedHashMap<>(sessionPartitions));
                 return new FetchRequestData(toSend, Collections.emptyList(), toSend, nextMetadata);
@@ -398,7 +398,7 @@ public class FetchSessionHandler {
                 nextMetadata = FetchMetadata.INITIAL;
                 return true;
             } else {
-                // The server created a new incremental fetch session.
+                // The server created a new incremental fetch session. 客户端正常处理全量拉取的响应
                 log.debug("Node {} sent a full fetch response that created a new incremental " +
                     "fetch session {}{}", node, response.sessionId(), responseDataToLogString(response));
                 nextMetadata = FetchMetadata.newIncremental(response.sessionId());
@@ -417,7 +417,7 @@ public class FetchSessionHandler {
                 nextMetadata = FetchMetadata.INITIAL;
                 return true;
             } else {
-                // The incremental fetch session was continued by the server.
+                // The incremental fetch session was continued by the server. 客户端正常处理增量拉取的响应结果
                 log.debug("Node {} sent an incremental fetch response for session {}{}",
                     node, response.sessionId(), responseDataToLogString(response));
                 nextMetadata = nextMetadata.nextIncremental();
