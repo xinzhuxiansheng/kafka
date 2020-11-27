@@ -154,7 +154,7 @@ public final class Sensor {
     public boolean shouldRecord() {
         return this.recordingLevel.shouldRecord(config.recordLevel().id);
     }
-    /**
+    /**Quota violated, but ignored, for sensor
      * Record a value with this sensor
      * @param value The value to record
      * @throws QuotaViolationException if recording this value moves a metric beyond its configured maximum or minimum
@@ -210,7 +210,7 @@ public final class Sensor {
                 if (quota != null) {
                     double value = metric.measurableValue(timeMs);
                     //System.out.println("checkQuotas value: "+value);
-                    if (!quota.acceptable(value)) {
+                    if (!quota.acceptable(value)) {    //yzhou  false
                         throw new QuotaViolationException(metric.metricName(), value,
                             quota.bound());
                     }

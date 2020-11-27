@@ -75,11 +75,12 @@ class ReplicationQuotasTest extends ZooKeeperTestHarness {
       * We also have two non-throttled partitions on two of the 6 brokers, just to make sure
       * regular replication works as expected.
       */
-
+    //100,101,102,103,104,105, 创建6个broker节点
     brokers = (100 to 105).map { id => createServer(fromProps(createBrokerConfig(id, zkConnect))) }
 
     //Given six partitions, led on nodes 0,1,2,3,4,5 but with followers on node 6,7 (not started yet)
     //And two extra partitions 6,7, which we don't intend on throttling.
+    // Topic 分区副本分布图，8分区，2副本
     val assignment = Map(
       0 -> Seq(100, 106), //Throttled
       1 -> Seq(101, 106), //Throttled
