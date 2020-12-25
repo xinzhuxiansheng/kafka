@@ -238,6 +238,7 @@ class ReplicaFetcherThread(name: String,
 
     val builder = fetchSessionHandler.newBuilder()
     partitionMap.foreach { case (topicPartition, fetchState) =>
+      // 如果它(副本)应该被限速，我们不会在fetch请求中包含它
       // We will not include a replica in the fetch request if it should be throttled.
       if (fetchState.isReadyForFetch && !shouldFollowerThrottle(quota, topicPartition)) {
         try {
@@ -328,6 +329,9 @@ class ReplicaFetcherThread(name: String,
    */
   private def shouldFollowerThrottle(quota: ReplicaQuota, topicPartition: TopicPartition): Boolean = {
     val isReplicaInSync = fetcherLagStats.isReplicaInSync(topicPartition)
+    if(topicPartition.topic() == "yzhoutp001") {
+      debug(s"shouldFollowerThrottle isThrottled: ${quota.isThrottled(topicPartition)} , isQuotaExceeded: ${quota.isQuotaExceeded} , isReplicaInSync: ${isReplicaInSync}")
+    }
     quota.isThrottled(topicPartition) && quota.isQuotaExceeded && !isReplicaInSync
   }
 

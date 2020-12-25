@@ -18,8 +18,11 @@ package org.apache.kafka.common.metrics;
 
 import org.apache.kafka.common.MetricName;
 import org.apache.kafka.common.metrics.CompoundStat.NamedMeasurable;
+import org.apache.kafka.common.network.SslChannelBuilder;
 import org.apache.kafka.common.utils.Time;
 import org.apache.kafka.common.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -40,6 +43,7 @@ import static java.util.Collections.unmodifiableList;
  * of metrics about request sizes such as the average or max.
  */
 public final class Sensor {
+    private static final Logger log = LoggerFactory.getLogger(Sensor.class);
 
     private final Metrics registry;
     private final String name;
@@ -209,6 +213,7 @@ public final class Sensor {
                 Quota quota = config.quota();
                 if (quota != null) {
                     double value = metric.measurableValue(timeMs);
+                    log.debug("Sensor_checkQuotas quota: {}, value: {}",quota.toString(),value);
                     if (!quota.acceptable(value)) {
                         throw new QuotaViolationException(metric.metricName(), value,
                             quota.bound());

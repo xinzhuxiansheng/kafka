@@ -683,7 +683,7 @@ class FetcherLagMetrics(metricId: ClientIdTopicPartition) extends KafkaMetricsGr
   }
 }
 
-class FetcherLagStats(metricId: ClientIdAndBroker) {
+class FetcherLagStats(metricId: ClientIdAndBroker){
   private val valueFactory = (k: ClientIdTopicPartition) => new FetcherLagMetrics(k)
   val stats = new Pool[ClientIdTopicPartition, FetcherLagMetrics](Some(valueFactory))
 
@@ -693,9 +693,10 @@ class FetcherLagStats(metricId: ClientIdAndBroker) {
 
   def isReplicaInSync(topicPartition: TopicPartition): Boolean = {
     val fetcherLagMetrics = stats.get(ClientIdTopicPartition(metricId.clientId, topicPartition))
-    if (fetcherLagMetrics != null)
+    if (fetcherLagMetrics != null) {
+      println(s"AbstractFetcherThread fetcherLagMetrics.lag: ${fetcherLagMetrics.lag}")
       fetcherLagMetrics.lag <= 0
-    else
+    } else
       false
   }
 
