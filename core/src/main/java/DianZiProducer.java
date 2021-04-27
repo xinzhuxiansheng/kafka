@@ -11,7 +11,7 @@ public class DianZiProducer {
         properties.put("client.id", "dc");
         properties.put("retries", 2); // 发送失败的最大尝试次数
         properties.put("batch.size", "1048576"); // 1MB
-        properties.put("compression.type", "gzip");
+        properties.put("compression.type", "snappy");
         properties.put("linger.ms", "5"); // 最长延迟5秒必须发送
         properties.put("buffer.memory", "67108864");// 64MB
         properties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");

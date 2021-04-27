@@ -10,16 +10,16 @@ public class DianZiConsumer {
 
     public static void main(String[] args) {
         Properties properties = new Properties();
-        properties.put("bootstrap.servers", "10.168.100.16:9093");
-        properties.put("client.id","97547075842844449607672c26674af4");
-        properties.setProperty("group.id", "yzhougroupid2019111401");
+        properties.put("bootstrap.servers", "10.168.66.204:9092");
+        properties.put("client.id","dc");
+        properties.setProperty("group.id", "yzhougroupid20191114012");
         properties.put("enable.auto.commit", "true");
         properties.put("auto.commit.interval.ms", "1000");
         properties.setProperty("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         properties.setProperty("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 
         KafkaConsumer<String,String> kafkaConsumer = new KafkaConsumer<String, String>(properties);
-        kafkaConsumer.subscribe(Arrays.asList("test_sy"));
+        kafkaConsumer.subscribe(Arrays.asList("test01"));
 
         while(true) {
             ConsumerRecords<String,String> records = kafkaConsumer.poll(Duration.ofSeconds(10));
