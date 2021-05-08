@@ -570,6 +570,7 @@ public class Selector implements Selectable, AutoCloseable {
                 }
 
                 attemptRead(key, channel);
+                //log.info("yzhou 0427 Selector attemptRead");
 
                 if (channel.hasBytesBuffered()) {
                     //this channel has bytes enqueued in intermediary buffers that we could not read

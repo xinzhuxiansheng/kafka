@@ -415,6 +415,8 @@ public class MemoryRecordsBuilder implements AutoCloseable {
                 firstTimestamp = timestamp;
 
             if (magic > RecordBatch.MAGIC_VALUE_V1) {
+                //yzhou
+                System.out.println("yzhou 0502 offset: "+offset);
                 appendDefaultRecord(offset, timestamp, key, value, headers);
                 return null;
             } else {
@@ -629,6 +631,10 @@ public class MemoryRecordsBuilder implements AutoCloseable {
         int offsetDelta = (int) (offset - baseOffset);
         long timestampDelta = timestamp - firstTimestamp;
         int sizeInBytes = DefaultRecord.writeTo(appendStream, offsetDelta, timestampDelta, key, value, headers);
+        // yzhou 数据已经添加到 appendStream之后
+        // 需要将offset设置成新的lastOffset
+        // 条数 +1
+        // 记录最大的offset及它的时间
         recordWritten(offset, timestamp, sizeInBytes);
     }
 
@@ -654,7 +660,7 @@ public class MemoryRecordsBuilder implements AutoCloseable {
         return offset;
     }
 
-    private void recordWritten(long offset, long timestamp, int size) {
+    private void recordWritten(long offset, long timestamp, int size) { // yzhou
         if (numRecords == Integer.MAX_VALUE)
             throw new IllegalArgumentException("Maximum number of records per batch exceeded, max records: " + Integer.MAX_VALUE);
         if (offset - baseOffset > Integer.MAX_VALUE)

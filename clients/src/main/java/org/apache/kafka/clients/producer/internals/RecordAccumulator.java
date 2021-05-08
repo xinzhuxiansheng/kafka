@@ -340,6 +340,7 @@ public final class RecordAccumulator {
         // Reset the estimated compression ratio to the initial value or the big batch compression ratio, whichever
         // is bigger. There are several different ways to do the reset. We chose the most conservative one to ensure
         // the split doesn't happen too often.
+        log.info("yzhou 0428: splitAndReenqueue");
         CompressionRatioEstimator.setEstimation(bigBatch.topicPartition.topic(), compression,
                                                 Math.max(1.0f, (float) bigBatch.compressionRatio()));
         Deque<ProducerBatch> dq = bigBatch.split(this.batchSize);
@@ -540,11 +541,13 @@ public final class RecordAccumulator {
 
             synchronized (deque) {
                 // invariant: !isMuted(tp,now) && deque != null
+                // yzhou 返回双端队列的第一个元素，否则当此双端队列为“空白”时返回null
                 ProducerBatch first = deque.peekFirst();
                 if (first == null)
                     continue;
 
                 // first != null
+                // 判断ProducerBatch的重试次数及下次重试的时间间隔
                 boolean backoff = first.attempts() > 0 && first.waitedTimeMs(now) < retryBackoffMs;
                 // Only drain the batch if it is not during backoff period.
                 if (backoff)
@@ -561,6 +564,7 @@ public final class RecordAccumulator {
                     boolean isTransactional = transactionManager != null ? transactionManager.isTransactional() : false;
                     ProducerIdAndEpoch producerIdAndEpoch =
                         transactionManager != null ? transactionManager.producerIdAndEpoch() : null;
+                    //yzhou 读取双端队列第一个元素，并且读取的元素会在队列中删除
                     ProducerBatch batch = deque.pollFirst();
                     if (producerIdAndEpoch != null && !batch.hasSequence()) {
                         // If the batch already has an assigned sequence, then we should not change the producer id and

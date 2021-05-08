@@ -35,7 +35,7 @@ public class NetworkReceive implements Receive {
     private static final ByteBuffer EMPTY_BUFFER = ByteBuffer.allocate(0);
 
     private final String source;
-    private final ByteBuffer size;
+    public final ByteBuffer size;
     private final int maxSize;
     private final MemoryPool memoryPool;
     private int requestedBufferSize = -1;
@@ -95,7 +95,7 @@ public class NetworkReceive implements Receive {
             if (bytesRead < 0)
                 throw new EOFException();
             read += bytesRead;
-            if (!size.hasRemaining()) {
+            if (!size.hasRemaining()) { // effective length
                 size.rewind();
                 int receiveSize = size.getInt();
                 if (receiveSize < 0)

@@ -105,6 +105,7 @@ public class BufferPool {
         ByteBuffer buffer = null;
         this.lock.lock();
         try {
+            //@1
             // check if we have a free buffer of the right size pooled
             if (size == poolableSize && !this.free.isEmpty())
                 return this.free.pollFirst();

@@ -182,7 +182,7 @@ public class Sender implements Runnable {
                 Iterator<ProducerBatch> iter = partitionInFlightBatches.iterator();
                 while (iter.hasNext()) {
                     ProducerBatch batch = iter.next();
-                    if (batch.hasReachedDeliveryTimeout(accumulator.getDeliveryTimeoutMs(), now)) {
+                    if (batch.hasReachedDeliveryTimeout(accumulator.getDeliveryTimeoutMs(), now)) { // delivery.timeout.ms 默认是 120s
                         iter.remove();
                         // expireBatches is called in Sender.sendProducerData, before client.poll.
                         // The !batch.isDone() invariant should always hold. An IllegalStateException
@@ -344,7 +344,7 @@ public class Sender implements Runnable {
         // create produce requests
         Map<Integer, List<ProducerBatch>> batches = this.accumulator.drain(cluster, result.readyNodes, this.maxRequestSize, now);
         addToInflightBatches(batches);
-        if (guaranteeMessageOrder) {
+        if (guaranteeMessageOrder) {  // yzhou max.in.flight.requests.per.connection 判断是否 == 1
             // Mute all the partitions drained
             for (List<ProducerBatch> batchList : batches.values()) {
                 for (ProducerBatch batch : batchList)

@@ -100,6 +100,9 @@ public class PlaintextTransportLayer implements TransportLayer {
     */
     @Override
     public int read(ByteBuffer dst) throws IOException {
+        if(dst.capacity()>100){
+            System.out.println("dst position: "+dst.position() +" , limit: "+dst.limit()+ " , capacity: "+dst.capacity());
+        }
         return socketChannel.read(dst);
     }
 

@@ -1023,7 +1023,7 @@ public class Fetcher<K, V> implements SubscriptionState.Listener, Closeable {
             TimestampType timestampType = batch.timestampType();
             Headers headers = new RecordHeaders(record.headers());
             ByteBuffer keyBytes = record.key();
-            System.out.println("yzhou: "+batch.compressionType());
+            //System.out.println("yzhou: "+batch.compressionType());
             byte[] keyByteArray = keyBytes == null ? null : Utils.toArray(keyBytes);
             K key = keyBytes == null ? null : this.keyDeserializer.deserialize(partition.topic(), headers, keyByteArray);
             ByteBuffer valueBytes = record.value();

@@ -421,6 +421,10 @@ public class KafkaChannel implements AutoCloseable {
     }
 
     private long receive(NetworkReceive receive) throws IOException {
+        //System.out.println("yzhou 0427 KafkaChannel receive");
+        if(receive.size ==null || receive.size.capacity()>100){
+            System.out.println("yzhou 0427 KafkaChannel receive");
+        }
         return receive.readFrom(transportLayer);
     }
 
