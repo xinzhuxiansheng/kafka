@@ -12,7 +12,7 @@ public class DianZiProducer {
         properties.put("retries", 2); // 发送失败的最大尝试次数
         properties.put("batch.size", "10000");
         properties.put("compression.type", "snappy");
-        properties.put("linger.ms", "5000000"); // 最长延迟5秒必须发送
+        properties.put("linger.ms", "100"); // 最长延迟5秒必须发送
         properties.put("buffer.memory", "67108864");// 64MB
         properties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         properties.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
@@ -30,7 +30,7 @@ public class DianZiProducer {
                     }
                 }
             });
-            Thread.currentThread().sleep(10000L);
+            Thread.currentThread().sleep(1000L);
             System.out.println(i);
             i++;
         }

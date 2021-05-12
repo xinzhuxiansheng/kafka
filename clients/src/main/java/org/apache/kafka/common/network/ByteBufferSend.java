@@ -36,7 +36,7 @@ public class ByteBufferSend implements Send {
         this.destination = destination;
         this.buffers = buffers;
         for (ByteBuffer buffer : buffers)
-            remaining += buffer.remaining();
+            remaining += buffer.remaining(); //remaining = limit - position
         this.size = remaining;
     }
 

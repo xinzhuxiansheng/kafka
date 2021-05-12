@@ -28,13 +28,13 @@ public class NetworkSend extends ByteBufferSend {
     }
 
     private static ByteBuffer[] sizeDelimit(ByteBuffer buffer) {
-        return new ByteBuffer[] {sizeBuffer(buffer.remaining()), buffer};
+        return new ByteBuffer[] {sizeBuffer(buffer.remaining()), buffer}; //java数组的初始化
     }
-
+    //
     private static ByteBuffer sizeBuffer(int size) {
         ByteBuffer sizeBuffer = ByteBuffer.allocate(4);
         sizeBuffer.putInt(size);
-        sizeBuffer.rewind();
+        sizeBuffer.rewind(); //把position设为0，limit不变，一般在把数据重写入Buffer前调用
         return sizeBuffer;
     }
 

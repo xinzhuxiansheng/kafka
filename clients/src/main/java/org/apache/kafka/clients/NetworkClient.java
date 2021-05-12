@@ -409,7 +409,7 @@ public class NetworkClient implements KafkaClient {
     public boolean isReady(Node node, long now) {
         // if we need to update our metadata now declare all requests unready to make metadata requests first
         // priority
-        return !metadataUpdater.isUpdateDue(now) && canSendRequest(node.idString(), now);
+        return !metadataUpdater.isUpdateDue(now) && canSendRequest(node.idString(), now); //DefaultMetadataUpdater
     }
 
     /**
@@ -1126,7 +1126,7 @@ public class NetworkClient implements KafkaClient {
 
     static class InFlightRequest {
         final RequestHeader header;
-        final String destination;
+        final String destination;  // nodeId
         final RequestCompletionHandler callback;
         final boolean expectResponse;
         final AbstractRequest request;

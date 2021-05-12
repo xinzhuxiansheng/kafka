@@ -335,7 +335,7 @@ public class Sender implements Runnable {
         long notReadyTimeout = Long.MAX_VALUE;
         while (iter.hasNext()) {
             Node node = iter.next();
-            if (!this.client.ready(node, now)) {
+            if (!this.client.ready(node, now)) { //NetworkClient
                 iter.remove();
                 notReadyTimeout = Math.min(notReadyTimeout, this.client.pollDelayMs(node, now));
             }
@@ -390,6 +390,7 @@ public class Sender implements Runnable {
             pollTimeout = 0;
         }
         sendProduceRequests(batches, now);
+        System.out.println("yzhou 0509: pollTimeout:  "+pollTimeout);
         return pollTimeout;
     }
 
